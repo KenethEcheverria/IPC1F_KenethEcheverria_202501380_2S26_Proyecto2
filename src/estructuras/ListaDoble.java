@@ -26,7 +26,7 @@ public class ListaDoble<T> {
     public boolean eliminar(T dato) {
         Nodo<T> actual = cabeza;
         while (actual != null) {
-            if (cabeza.dato.equals(dato)) {
+            if (actual.dato.equals(dato)) {
                 if (actual.anterior != null) actual.anterior.siguiente = actual.siguiente;
                 else cabeza = actual.siguiente;
                 if (actual.siguiente != null) actual.siguiente.anterior = actual.anterior;
