@@ -27,12 +27,17 @@ public class Espacio {
         return tipo;
     }
 
+    public synchronized Vehiculo getVehiculo() {
+        return vehiculo;
+    }
+
     public synchronized boolean estaLibre() {
         return vehiculo == null;
     }
 
     // Impide que dos vehículos ocupen el mismo espacio.
     public synchronized boolean ocupar(Vehiculo vehiculo) {
+
         if (vehiculo == null || this.vehiculo != null) {
             return false;
         }
@@ -41,10 +46,12 @@ public class Espacio {
         return true;
     }
 
-    // Libera el espacio y devuelve el vehículo que estaba estacionado.
+    // Libera el espacio y devuelve el vehículo estacionado.
     public synchronized Vehiculo liberar() {
+
         Vehiculo retirado = this.vehiculo;
         this.vehiculo = null;
+
         return retirado;
     }
 }

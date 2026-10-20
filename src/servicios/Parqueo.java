@@ -1,0 +1,95 @@
+package servicios;
+
+import estructuras.ListaCircularEspacios;
+import modelo.Espacio;
+import modelo.Vehiculo;
+import modelo.Vehiculo.EstadoVehiculo;
+
+public class Parqueo {
+
+    private final ListaCircularEspacios areaSocios;
+    private final ListaCircularEspacios areaGeneral;
+
+    public Parqueo() {
+
+        // Área de socios: filas A, B y C con 25 espacios cada una.
+        areaSocios = new ListaCircularEspacios('A', 'C', 25, Espacio.TipoEspacio.SOCIO);
+
+        /* Área general: filas E, F, G, H e I con 15 espacios.
+           La distribución del residencial no incluye la fila D. */
+        areaGeneral = new ListaCircularEspacios('E', 'I', 15, Espacio.TipoEspacio.GENERAL);
+    }
+
+    // Aplica las restricciones de área y evita asignaciones duplicadas.
+    public synchronized Espacio asignarEspacio(Vehiculo vehiculo, boolean esSocio) {
+
+        if (vehiculo == null
+                || vehiculo.getPlaca() == null
+                || vehiculo.getPlaca().isBlank()
+                || vehiculo.getEstado() != EstadoVehiculo.EN_COLA_ENTRADA
+                || buscarEspacioPorPlaca(vehiculo.getPlaca()) != null) {
+            return null;
+        }
+
+        Espacio asignado = null;
+
+        // Los socios tienen prioridad en su área exclusiva.
+        if (esSocio) {
+            asignado = areaSocios.asignar(vehiculo);
+        }
+
+        // Socios sin espacio, no socios y visitantes utilizan el área general.
+        if (asignado == null) {
+            asignado = areaGeneral.asignar(vehiculo);
+        }
+
+        // Un vehículo rechazado regresa al estado FUERA.
+        if (asignado == null) {
+            vehiculo.setEstado(EstadoVehiculo.FUERA);
+        } else {
+            vehiculo.setEstado(EstadoVehiculo.ESTACIONADO);
+        }
+
+        return asignado;
+    }
+
+    // El espacio se libera cuando la garita procesa la salida.
+    public synchronized Espacio liberarEspacio(Vehiculo vehiculo) {
+
+        if (vehiculo == null || vehiculo.getEstado() != EstadoVehiculo.EN_COLA_SALIDA) {
+
+            return null;
+        }
+
+        Espacio espacio = buscarEspacioPorPlaca(vehiculo.getPlaca());
+
+        if (espacio == null || espacio.getVehiculo() != vehiculo) {
+            return null;
+        }
+
+        espacio.liberar();
+        vehiculo.setEstado(EstadoVehiculo.FUERA);
+
+        return espacio;
+    }
+
+    // Busca un vehículo estacionado en cualquiera de las dos áreas.
+    public synchronized Espacio buscarEspacioPorPlaca(String placa) {
+
+        Espacio espacio = areaSocios.buscarPorPlaca(placa);
+
+        if (espacio != null) {
+            return espacio;
+        }
+
+        return areaGeneral.buscarPorPlaca(placa);
+    }
+
+    public ListaCircularEspacios getAreaSocios() {
+        return areaSocios;
+    }
+
+    public ListaCircularEspacios getAreaGeneral() {
+        return areaGeneral;
+    }
+}
