@@ -3,26 +3,24 @@ package modelo;
 public class Vehiculo {
 
     public enum TipoVehiculo {
-        AUTOMOVIL,
-        MOTOCICLETA,
-        PICKUP
+        AUTOMOVIL, MOTOCICLETA, PICKUP
     }
 
     public enum EstadoVehiculo {
-        FUERA,
-        EN_COLA_ENTRADA,
-        ESTACIONADO,
-        EN_COLA_SALIDA
+        FUERA, EN_COLA_ENTRADA, ESTACIONADO, EN_COLA_SALIDA
     }
 
     private final String placa;
-    private String marca;
-    private String modelo;
-    private String color;
-    private TipoVehiculo tipo;
-    private EstadoVehiculo estado;
+    private final String marca;
+    private final String modelo;
+    private final String color;
+    private final TipoVehiculo tipo;
 
-    // Constructor para vehículos registrados de residentes.
+    private volatile EstadoVehiculo estado;
+    private volatile Espacio espacio;
+    private volatile Residente propietario;
+    private volatile Visitante visitante;
+
     public Vehiculo(String placa, String marca, String modelo, String color, TipoVehiculo tipo) {
         this.placa = placa;
         this.marca = marca;
@@ -32,10 +30,48 @@ public class Vehiculo {
         this.estado = EstadoVehiculo.FUERA;
     }
 
-    // Los vehículos temporales de visitantes solo requieren placa.
+    // Los visitantes se identifican por placa y no necesitan datos adicionales del vehículo.
     public Vehiculo(String placa) {
         this(placa, "", "", "", null);
     }
+
+    public TipoUsuario getTipoUsuario() {
+        if (visitante != null) {
+            return TipoUsuario.VISITANTE;
+        }
+
+        return propietario != null && propietario.isSocio() ? TipoUsuario.SOCIO : TipoUsuario.No_SOCIO;
+    }
+
+    public boolean esDeSocio() {
+        return propietario != null && propietario.isSocio() && visitante == null;
+    }
+
+    public boolean esVisitante() {
+        return visitante != null;
+    }
+
+    public String getNombreUsuario() {
+        if (visitante != null) {
+            return visitante.getNombre();
+        }
+
+        return propietario != null ? propietario.getNombre() : "-";
+    }
+
+    // Las relaciones se establecen desde las entidades del paquete modelo
+    void setPropietario(Residente propietario) {
+        this.propietario = propietario;
+    }
+
+    void setVisitante(Visitante visitante) {
+        this.visitante = visitante;
+    }
+
+    void setEspacio(Espacio espacio) {
+        this.espacio = espacio;
+    }
+
 
     public String getPlaca() {
         return placa;
@@ -45,39 +81,39 @@ public class Vehiculo {
         return marca;
     }
 
-    public void setMarca(String marca) {
-        this.marca = marca;
-    }
-
     public String getModelo() {
         return modelo;
-    }
-
-    public void setModelo(String modelo) {
-        this.modelo = modelo;
     }
 
     public String getColor() {
         return color;
     }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
-
     public TipoVehiculo getTipo() {
         return tipo;
-    }
-
-    public void setTipo(TipoVehiculo tipo) {
-        this.tipo = tipo;
     }
 
     public EstadoVehiculo getEstado() {
         return estado;
     }
 
+    public Espacio getEspacio() {
+        return espacio;
+    }
+
+    public Residente getPropietario() {
+        return propietario;
+    }
+    public Visitante getVisitante() {
+        return visitante;
+    }
+
     public void setEstado(EstadoVehiculo estado) {
         this.estado = estado;
+    }
+
+    @Override
+    public String toString() {
+        return placa + " - " + getNombreUsuario();
     }
 }

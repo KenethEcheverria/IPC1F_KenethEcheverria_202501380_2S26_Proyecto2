@@ -3,9 +3,7 @@ package modelo;
 public class Espacio {
 
     public enum TipoEspacio {
-        SOCIO,
-        GENERAL
-    }
+        SOCIO, GENERAL}
 
     private final String identificador;
     private final TipoEspacio tipo;
@@ -14,9 +12,6 @@ public class Espacio {
     public Espacio(String identificador, TipoEspacio tipo) {
         this.identificador = identificador;
         this.tipo = tipo;
-
-        // Todos los espacios inician libres.
-        this.vehiculo = null;
     }
 
     public String getIdentificador() {
@@ -38,19 +33,30 @@ public class Espacio {
     // Impide que dos vehículos ocupen el mismo espacio.
     public synchronized boolean ocupar(Vehiculo vehiculo) {
 
-        if (vehiculo == null || this.vehiculo != null) {
+        if (vehiculo == null || this.vehiculo != null || vehiculo.getEspacio() != null) {
+            return false;
+        }
+
+        if (tipo == TipoEspacio.SOCIO && !vehiculo.esDeSocio()) {
             return false;
         }
 
         this.vehiculo = vehiculo;
+        vehiculo.setEspacio(this);
+
         return true;
     }
 
     // Libera el espacio y devuelve el vehículo estacionado.
     public synchronized Vehiculo liberar() {
 
-        Vehiculo retirado = this.vehiculo;
-        this.vehiculo = null;
+        Vehiculo retirado = vehiculo;
+
+        if (retirado != null) {
+            retirado.setEspacio(null);
+        }
+
+        vehiculo = null;
 
         return retirado;
     }

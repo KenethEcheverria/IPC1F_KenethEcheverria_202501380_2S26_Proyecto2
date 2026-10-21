@@ -21,20 +21,23 @@ public class Parqueo {
     }
 
     // Aplica las restricciones de área y evita asignaciones duplicadas.
-    public synchronized Espacio asignarEspacio(Vehiculo vehiculo, boolean esSocio) {
+    public synchronized Espacio asignarEspacio(Vehiculo vehiculo) {
 
         if (vehiculo == null
                 || vehiculo.getPlaca() == null
                 || vehiculo.getPlaca().isBlank()
+                || (vehiculo.getPropietario() == null && !vehiculo.esVisitante())
                 || vehiculo.getEstado() != EstadoVehiculo.EN_COLA_ENTRADA
+                || vehiculo.getEspacio() != null
                 || buscarEspacioPorPlaca(vehiculo.getPlaca()) != null) {
+
             return null;
         }
 
         Espacio asignado = null;
 
         // Los socios tienen prioridad en su área exclusiva.
-        if (esSocio) {
+        if (vehiculo.esDeSocio()) {
             asignado = areaSocios.asignar(vehiculo);
         }
 
@@ -44,11 +47,7 @@ public class Parqueo {
         }
 
         // Un vehículo rechazado regresa al estado FUERA.
-        if (asignado == null) {
-            vehiculo.setEstado(EstadoVehiculo.FUERA);
-        } else {
-            vehiculo.setEstado(EstadoVehiculo.ESTACIONADO);
-        }
+       vehiculo.setEstado(asignado == null ? EstadoVehiculo.FUERA : EstadoVehiculo.ESTACIONADO);
 
         return asignado;
     }
@@ -78,11 +77,7 @@ public class Parqueo {
 
         Espacio espacio = areaSocios.buscarPorPlaca(placa);
 
-        if (espacio != null) {
-            return espacio;
-        }
-
-        return areaGeneral.buscarPorPlaca(placa);
+        return espacio != null ? espacio : areaGeneral.buscarPorPlaca(placa);
     }
 
     public ListaCircularEspacios getAreaSocios() {

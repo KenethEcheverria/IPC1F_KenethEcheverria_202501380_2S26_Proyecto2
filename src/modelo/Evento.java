@@ -16,8 +16,11 @@ public class Evento {
         RESIDENTE_ELIMINADO,
         VEHICULO_REGISTRADO,
         VEHICULO_ELIMINADO,
-        VISITANTE_REGISTRADO
+        VISITANTE_REGISTRADO,
+        LINEA_OMITIDA
     }
+
+    private static final DateTimeFormatter FORMATO = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private final LocalDateTime fechaHora;
     private final TipoEvento tipo;
@@ -52,11 +55,9 @@ public class Evento {
     @Override
     public String toString() {
 
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd//MM/yyyy HH:mm:ss");
+       String texto = fechaHora.format(FORMATO) + " | " + tipo + " | " + descripcion;
 
-        String texto = fechaHora.format(formato) + " | " + tipo + " | " + descripcion;
-
-        if (garita != null && !garita.isEmpty()) {
+        if (garita != null && !garita.isBlank()) {
             texto += " | Garita: " + garita;
         }
 
