@@ -33,7 +33,7 @@ public class GaritaSalida extends Garita {
             // El espacio se libera cuando finaliza la atención
             Espacio espacio = parqueo.liberarEspacio(vehiculo);
 
-            if (espacio != null) {
+            if (espacio == null) {
 
                 residencial.registrarEvento(Evento.TipoEvento.VEHICULO_RECHAZADO, "No se pudo procesar la salida del vehículo " + vehiculo.getPlaca() + ". No se encontró su espacio ocupado.", getNombre());
 
