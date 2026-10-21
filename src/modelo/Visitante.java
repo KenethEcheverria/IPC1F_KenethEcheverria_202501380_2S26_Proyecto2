@@ -12,6 +12,7 @@ public class Visitante {
 
         //El vehículo temporal comparte el flujo de entrada y salida con los vehículos registrados de los residentes.
         this.vehiculo = new Vehiculo(placa);
+        this.vehiculo.setVisitante(this);
     }
 
     public String getNombre() {

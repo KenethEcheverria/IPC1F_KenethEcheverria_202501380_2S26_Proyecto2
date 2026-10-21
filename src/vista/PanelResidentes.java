@@ -25,6 +25,8 @@ public class PanelResidentes extends JPanel {
     private final Residencial residencial;
     private final Runnable alCambiar;
     private final JTextArea listado = new JTextArea();
+    private String filtroId = null;
+    private boolean ordenInverso = false;
 
     public PanelResidentes(Residencial residencial, Runnable alCambiar) {
         this.residencial = residencial;
@@ -38,7 +40,8 @@ public class PanelResidentes extends JPanel {
         boton(acciones, "Eliminar residente", this::eliminarResidente);
         boton(acciones, "Registrar vehículo", this::registrarVehiculo);
         boton(acciones, "Eliminar vehículo", this::eliminarVehiculo);
-        boton(acciones, "Mostrar todos", this::actualizar);
+        boton(acciones, "Orden inverso", this::mostrarInverso);
+        boton(acciones, "Mostrar todos", this::mostrarTodos);
 
         listado.setEditable(false);
         add(acciones, BorderLayout.NORTH);
@@ -107,10 +110,11 @@ public class PanelResidentes extends JPanel {
                 JOptionPane.showMessageDialog(this, "No se encontró el residente.");
                 return;
             }
-            StringBuilder texto = new StringBuilder();
-            agregarResidente(texto, residente);
-            listado.setText(texto.toString());
+
+            filtroId = residente.getId();
         }
+
+        actualizar();
     }
 
     private void modificarResidente() {
@@ -177,14 +181,40 @@ public class PanelResidentes extends JPanel {
         }
     }
 
+    private void mostrarInverso() {
+        filtroId = null;
+        ordenInverso = true;
+        actualizar();
+    }
+
+    private void mostrarTodos() {
+        filtroId = null;
+        ordenInverso = false;
+        actualizar();
+    }
+
     // La información se consulta directamente en las listas enlazadas.
     public void actualizar() {
         StringBuilder texto = new StringBuilder();
         synchronized (residencial) {
-            Nodo<Residente> actual = residencial.getResidentes().getCabeza();
-            while (actual != null) {
-                agregarResidente(texto, actual.dato);
-                actual = actual.siguiente;
+            if (filtroId != null) {
+
+                Residente residente = residencial.buscarResidente(filtroId);
+
+                if (residente != null) {
+                    agregarResidente(texto, residente);
+                }
+
+            } else {
+
+                Nodo<Residente> actual = ordenInverso ? residencial.getResidentes().getCola() : residencial.getResidentes().getCabeza();
+
+                while (actual != null) {
+
+                    agregarResidente(texto, actual.dato);
+
+                    actual = ordenInverso ? actual.anterior : actual.siguiente;
+                }
             }
         }
         listado.setText(texto.length() == 0 ? "No hay residentes registrados." : texto.toString());

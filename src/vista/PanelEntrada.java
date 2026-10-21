@@ -14,6 +14,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -32,6 +35,8 @@ public class PanelEntrada extends JPanel {
     private final JTextArea cola = new JTextArea();
     private final JLabel estadoGarita1 = new JLabel();
     private final JLabel estadoGarita2 = new JLabel();
+    private String ultimaPlaca1 = "Ninguna";
+    private String ultimaPlaca2 = "Ninguna";
 
     public PanelEntrada(Residencial residencial, GaritaEntrada garita1,
                         GaritaEntrada garita2, Runnable alCambiar) {
@@ -67,14 +72,29 @@ public class PanelEntrada extends JPanel {
 
         cola.setEditable(false);
         cola.setBorder(BorderFactory.createTitledBorder("Cola de entrada (FIFO)"));
-        JPanel garitas = new JPanel(new GridLayout(1, 2));
+        JPanel garitas = new JPanel(new GridLayout(1, 2, 8, 0));
         garitas.setBorder(BorderFactory.createTitledBorder("Garitas de entrada"));
+
+        configurarGarita(estadoGarita1, "Entrada 1");
+        configurarGarita(estadoGarita2, "Entrada 2");
+
         garitas.add(estadoGarita1);
         garitas.add(estadoGarita2);
 
+        JPanel contenido = new JPanel(new BorderLayout(8, 8));
+        contenido.add(garitas, BorderLayout.NORTH);
+        contenido.add(new JScrollPane(cola), BorderLayout.CENTER);
+
         add(formularios, BorderLayout.NORTH);
-        add(new JScrollPane(cola), BorderLayout.CENTER);
-        add(garitas, BorderLayout.SOUTH);
+        add(contenido, BorderLayout.CENTER);
+    }
+
+    private void configurarGarita(JLabel etiqueta, String nombre) {
+
+        etiqueta.setOpaque(true);
+        etiqueta.setHorizontalAlignment(SwingConstants.CENTER);
+        etiqueta.setPreferredSize(new Dimension(200, 80));
+        etiqueta.setBorder(BorderFactory.createTitledBorder(nombre));
     }
 
     private void ingresarResidente() {
@@ -111,11 +131,34 @@ public class PanelEntrada extends JPanel {
             }
         }
         cola.setText(texto.length() == 0 ? "Cola vacía" : texto.toString());
-        estadoGarita1.setText(garita1.getNombre() + ": " + descripcion(garita1.getEnAtencion()));
-        estadoGarita2.setText(garita2.getNombre() + ": " + descripcion(garita2.getEnAtencion()));
+        Vehiculo atendido1 = garita1.getEnAtencion();
+        Vehiculo atendido2 = garita2.getEnAtencion();
+
+        if (atendido1 != null) {
+            ultimaPlaca1 = atendido1.getPlaca();
+        }
+
+        if (atendido2 != null) {
+            ultimaPlaca2 = atendido2.getPlaca();
+        }
+
+        mostrarGarita(estadoGarita1, atendido1, ultimaPlaca1);
+        mostrarGarita(estadoGarita2, atendido2, ultimaPlaca2);
     }
 
-    private String descripcion(Vehiculo vehiculo) {
-        return vehiculo == null ? "Libre" : "Atendiendo " + vehiculo.getPlaca();
+    private void mostrarGarita(JLabel etiqueta, Vehiculo vehiculo, String ultimaPlaca) {
+
+        if (vehiculo != null) {
+
+            etiqueta.setText("<html><center>ATENDIENDO<br>" + vehiculo.getPlaca() + "</center></html>");
+
+            etiqueta.setBackground(new Color(255, 232, 185));
+
+        } else {
+
+            etiqueta.setText("<html><center>LIBRE<br>Última atención: " + ultimaPlaca + "</center></html>");
+
+            etiqueta.setBackground(new Color(210, 239, 216));
+        }
     }
 }
