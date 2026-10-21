@@ -3,7 +3,7 @@ package modelo;
 public enum TipoUsuario {
 
     SOCIO("Socio"),
-    No_SOCIO("No socio"),
+    NO_SOCIO("No socio"),
     VISITANTE("Visitante");
 
     private final String etiqueta;

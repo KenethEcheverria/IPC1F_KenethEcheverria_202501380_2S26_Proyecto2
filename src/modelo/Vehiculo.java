@@ -40,7 +40,7 @@ public class Vehiculo {
             return TipoUsuario.VISITANTE;
         }
 
-        return propietario != null && propietario.isSocio() ? TipoUsuario.SOCIO : TipoUsuario.No_SOCIO;
+        return propietario != null && propietario.isSocio() ? TipoUsuario.SOCIO : TipoUsuario.NO_SOCIO;
     }
 
     public boolean esDeSocio() {
