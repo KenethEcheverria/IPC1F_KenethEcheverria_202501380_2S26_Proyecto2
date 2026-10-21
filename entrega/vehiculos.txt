@@ -1,0 +1,2 @@
+SOC001|Toyota|Corolla|Blanco|701
+GEN001|Honda|Civic|Azul|702
