@@ -148,10 +148,15 @@ public class PanelResidentes extends JPanel {
                 "¿Eliminar al residente " + id + " y sus vehículos?", "Confirmar",
                 JOptionPane.YES_NO_OPTION);
         if (respuesta == JOptionPane.YES_OPTION) {
-            ejecutar(() -> residencial.eliminarResidente(id));
+            ejecutar(() -> {
+                residencial.eliminarResidente(id);
+
+                if (id.trim().equals(filtroId)) {
+                    filtroId = null;
+                }
+            });
         }
     }
-
     private void registrarVehiculo() {
         JTextField id = new JTextField();
         JTextField placa = new JTextField();
