@@ -17,6 +17,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
@@ -29,6 +32,7 @@ public class PanelSalida extends JPanel {
     private final JComboBox<String> disponibles = new JComboBox<>();
     private final JTextArea cola = new JTextArea();
     private final JLabel estadoGarita = new JLabel();
+    private String ultimaPlaca = "Ninguna";
 
     public PanelSalida(Residencial residencial, Parqueo parqueo,
                        GaritaSalida garita, Runnable alCambiar) {
@@ -47,9 +51,18 @@ public class PanelSalida extends JPanel {
 
         cola.setEditable(false);
         cola.setBorder(BorderFactory.createTitledBorder("Cola de salida (FIFO)"));
+
+        estadoGarita.setOpaque(true);
+        estadoGarita.setHorizontalAlignment(SwingConstants.CENTER);
+        estadoGarita.setPreferredSize(new Dimension(250, 80));
+        estadoGarita.setBorder(BorderFactory.createTitledBorder("Garita de salida"));
+
+        JPanel contenido = new JPanel(new BorderLayout(8, 8));
+        contenido.add(estadoGarita, BorderLayout.NORTH);
+        contenido.add(new JScrollPane(cola), BorderLayout.CENTER);
+
         add(acciones, BorderLayout.NORTH);
         add(new JScrollPane(cola), BorderLayout.CENTER);
-        add(estadoGarita, BorderLayout.SOUTH);
     }
 
     private void solicitarSalida() {
@@ -94,8 +107,19 @@ public class PanelSalida extends JPanel {
         }
         cola.setText(texto.length() == 0 ? "Cola vacía" : texto.toString());
         Vehiculo atendido = garita.getEnAtencion();
-        estadoGarita.setText("Garita de salida: "
-                + (atendido == null ? "Libre" : "Atendiendo " + atendido.getPlaca()));
+
+        if (atendido != null) {
+            ultimaPlaca = atendido.getPlaca();
+
+            estadoGarita.setText("<html><center>ATENDIENDO<br>" + atendido.getPlaca() + "</center></htmnl>");
+
+            estadoGarita.setBackground(new Color(255, 232, 185));
+
+        } else {
+            estadoGarita.setText("<html><center>LIBRE<br>Última atención: " + ultimaPlaca + "</center></html>");
+
+            estadoGarita.setBackground(new Color(210, 239, 216));
+        }
     }
 
     private void agregarEstacionados(ListaCircularEspacios area) {

@@ -151,9 +151,7 @@ public class PanelResidentes extends JPanel {
             ejecutar(() -> {
                 residencial.eliminarResidente(id);
 
-                if (id.trim().equals(filtroId)) {
                     filtroId = null;
-                }
             });
         }
     }
