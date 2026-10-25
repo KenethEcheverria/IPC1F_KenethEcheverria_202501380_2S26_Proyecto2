@@ -9,7 +9,7 @@
 | Dato     | Información                                                   |
 | -------- | ------------------------------------------------------------- |
 | Curso    | Laboratorio de Introducción a la Programación y Computación 1 |
-| Sección  | IPC1F                                                         |
+| Sección  | F                                                             |
 | Periodo  | Segundo semestre de 2026                                      |
 | Autor    | Keneth David Echeverria González                              |
 | Proyecto | Proyecto 2 — ResiPark                                         |
