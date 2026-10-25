@@ -72,6 +72,26 @@ public class Parqueo {
         return espacio;
     }
 
+    // Reconstruye la ocupación de un vehículo registrado.
+    public synchronized boolean restaurarEstacionado(
+            Vehiculo vehiculo, String identificador) {
+
+        if (vehiculo == null || vehiculo.getPropietario() == null
+                || vehiculo.getEstado() != EstadoVehiculo.FUERA
+                || vehiculo.getEspacio() != null) {
+            return false;
+        }
+
+        boolean restaurado = areaSocios.restaurar(identificador, vehiculo)
+                || areaGeneral.restaurar(identificador, vehiculo);
+
+        if (restaurado) {
+            vehiculo.setEstado(EstadoVehiculo.ESTACIONADO);
+        }
+
+        return restaurado;
+    }
+
     // Busca un vehículo estacionado en cualquiera de las dos áreas.
     public synchronized Espacio buscarEspacioPorPlaca(String placa) {
 

@@ -94,6 +94,36 @@ public class ListaCircularEspacios {
         return null;
     }
 
+    // Recupera un vehículo en su espacio original.
+    public synchronized boolean restaurar(String identificador, Vehiculo vehiculo) {
+
+        if (identificador == null || vehiculo == null
+                || cabeza == null || vehiculo.getEspacio() != null) {
+            return false;
+        }
+
+        NodoEspacio actual = cabeza;
+
+        do {
+            Espacio espacio = actual.getEspacio();
+
+            if (identificador.equalsIgnoreCase(espacio.getIdentificador())) {
+
+                if (!espacio.ocupar(vehiculo)) {
+                    return false;
+                }
+
+                ultimoAsignado = actual;
+                return true;
+            }
+
+            actual = actual.getSiguiente();
+
+        } while (actual != cabeza);
+
+        return false;
+    }
+
     // Localiza el espacio ocupado por una placa.
     public synchronized Espacio buscarPorPlaca(String placa) {
 

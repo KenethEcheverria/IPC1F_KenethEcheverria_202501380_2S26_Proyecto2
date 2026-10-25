@@ -5,6 +5,7 @@ import modelo.Evento;
 import modelo.ReglaNegocioException;
 import modelo.Residente;
 import modelo.Vehiculo;
+import servicios.Parqueo;
 import servicios.Residencial;
 
 import java.io.BufferedReader;
@@ -19,6 +20,7 @@ public class GestorArchivos {
 
     public static final String ARCHIVO_RESIDENTES = "residentes.txt";
     public static final String ARCHIVO_VEHICULOS = "vehiculos.txt";
+    public static final String ARCHIVO_OCUPACION = "ocupacion.txt";
 
     private GestorArchivos() {
         // La clase únicamente contiene operaciones estáticas.
@@ -28,9 +30,15 @@ public class GestorArchivos {
     public static void guardar(Residencial residencial) throws IOException {
 
         synchronized (residencial) {
-            try (BufferedWriter archivoResidentes = Files.newBufferedWriter(Paths.get(ARCHIVO_RESIDENTES), StandardCharsets.UTF_8);
 
-                 BufferedWriter archivoVehiculos = Files.newBufferedWriter(Paths.get(ARCHIVO_VEHICULOS), StandardCharsets.UTF_8)) {
+            try (BufferedWriter archivoResidentes = Files.newBufferedWriter(
+                    Paths.get(ARCHIVO_RESIDENTES), StandardCharsets.UTF_8);
+
+                 BufferedWriter archivoVehiculos = Files.newBufferedWriter(
+                         Paths.get(ARCHIVO_VEHICULOS), StandardCharsets.UTF_8);
+
+                 BufferedWriter archivoOcupacion = Files.newBufferedWriter(
+                         Paths.get(ARCHIVO_OCUPACION), StandardCharsets.UTF_8)) {
 
                 Nodo<Residente> actual = residencial.getResidentes().getCabeza();
 
@@ -57,6 +65,17 @@ public class GestorArchivos {
                         );
 
                         archivoVehiculos.newLine();
+
+                        if (vehiculo.getEspacio() != null) {
+
+                            archivoOcupacion.write(
+                                    vehiculo.getPlaca() + "|ESTACIONADO|"
+                                            + vehiculo.getEspacio().getIdentificador()
+                            );
+
+                            archivoOcupacion.newLine();
+                        }
+
                         nodoVehiculo = nodoVehiculo.siguiente;
                     }
 
@@ -67,9 +86,10 @@ public class GestorArchivos {
     }
 
     // Al iniciar, se crean las listas desde los archivos disponibles.
-    public static void cargar(Residencial residencial) {
+    public static void cargar(Residencial residencial, Parqueo parqueo) {
         cargarResidentes(residencial);
         cargarVehiculos(residencial);
+        cargarOcupacion(residencial, parqueo);
     }
 
     private static void cargarResidentes(Residencial residencial) {
@@ -162,6 +182,66 @@ public class GestorArchivos {
 
         } catch (IOException e) {
             registrarFalloLectura(residencial, ARCHIVO_VEHICULOS, e);
+        }
+    }
+
+    // Recupera los espacios ocupados después de cargar los vehículos.
+    private static void cargarOcupacion(
+            Residencial residencial, Parqueo parqueo) {
+
+        Path ruta = Paths.get(ARCHIVO_OCUPACION);
+
+        if (!Files.exists(ruta)) {
+            return;
+        }
+
+        try (BufferedReader lector = Files.newBufferedReader(
+                ruta, StandardCharsets.UTF_8)) {
+
+            String linea;
+            int numero = 0;
+
+            while ((linea = lector.readLine()) != null) {
+
+                numero++;
+                linea = limpiar(linea);
+
+                if (linea.isEmpty()) {
+                    continue;
+                }
+
+                String[] campos = linea.split("\\|", -1);
+
+                try {
+                    if (campos.length != 3) {
+                        throw new ReglaNegocioException(
+                                "Se esperaban tres campos.");
+                    }
+
+                    if (!campos[1].trim().equalsIgnoreCase("ESTACIONADO")) {
+                        throw new ReglaNegocioException(
+                                "Estado de ocupación inválido.");
+                    }
+
+                    Vehiculo vehiculo =
+                            residencial.buscarVehiculo(campos[0]);
+
+                    if (!parqueo.restaurarEstacionado(
+                            vehiculo, campos[2].trim())) {
+
+                        throw new ReglaNegocioException(
+                                "Vehículo o espacio inválido, duplicado o no permitido.");
+                    }
+
+                } catch (ReglaNegocioException e) {
+                    omitir(residencial, ARCHIVO_OCUPACION,
+                            numero, e.getMessage());
+                }
+            }
+
+        } catch (IOException e) {
+            registrarFalloLectura(
+                    residencial, ARCHIVO_OCUPACION, e);
         }
     }
 

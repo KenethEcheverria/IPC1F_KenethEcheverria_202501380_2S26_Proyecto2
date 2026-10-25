@@ -42,7 +42,7 @@ public class VentanaPrincipal extends JFrame {
         setLayout(new BorderLayout());
 
         // La información se reconstruye antes de iniciar las garitas.
-        GestorArchivos.cargar(residencial);
+        GestorArchivos.cargar(residencial, parqueo);
 
         garita1 = new GaritaEntrada("Entrada 1", residencial, parqueo, this::actualizarTodo);
         garita2 = new GaritaEntrada("Entrada 2", residencial, parqueo, this::actualizarTodo);
@@ -103,22 +103,36 @@ public class VentanaPrincipal extends JFrame {
 
         // Se espera a las garitas antes de guardar los archivos.
         new Thread(() -> {
-            garita1.detener();
-            garita2.detener();
-            garitaSalida.detener();
-
             try {
+
+                // Finaliza las solicitudes que ya están en las colas.
+                while (residencial.getColaEntrada().getTamanio() > 0
+                        || residencial.getColaSalida().getTamanio() > 0) {
+
+                    Thread.sleep(100);
+                }
+
+                garita1.detener();
+                garita2.detener();
+                garitaSalida.detener();
+
                 garita1.esperarFinalizacion();
                 garita2.esperarFinalizacion();
                 garitaSalida.esperarFinalizacion();
+
                 GestorArchivos.guardar(residencial);
 
                 SwingUtilities.invokeLater(this::dispose);
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                mostrarErrorCierre("Se interrumpió el cierre de las garitas.");
+                mostrarErrorCierre(
+                        "Se interrumpió el cierre de las garitas.");
+
             } catch (IOException e) {
-                mostrarErrorCierre("No fue posible guardar los archivos: " + e.getMessage());
+                mostrarErrorCierre(
+                        "No fue posible guardar los archivos: "
+                                + e.getMessage());
             }
         }, "Cierre-ResiPark").start();
     }
