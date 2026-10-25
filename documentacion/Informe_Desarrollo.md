@@ -56,8 +56,14 @@ El avance del proyecto se registró mediante commits incrementales. A continuaci
 | 21/oct       | [`aefecb7`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/aefecb755504db546560467dfaf10d846c35f694) | Corrección de visitantes y mejora de la interfaz de entrada.              |
 | 23/oct       | [`a5987c2`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/a5987c236a90c38a4f1659939e273e9fc4ec3024) | Compatibilidad del JAR con Java 17 y corrección del filtro de residentes. |
 | 23/oct       | [`e72a6fd`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/e72a6fddec34b735dc627c4fbdd4bb44a1a6c7c6) | Mejora visual de salida y ajuste del filtro de residentes.                |
+| 24/oct | [`d124d59`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/d124d59) | Implementación de recuperación de vehículos estacionados mediante `ocupacion.txt`. |
+| 24/oct | [`f4309ba`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/f4309ba) | Corrección de la visualización de la garita de salida. |
+| 24/oct | [`381fde9`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/381fde9) | Recuperación del JAR en la carpeta de entrega. |
+| 24/oct | [`f521d27`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/f521d27) | Incorporación del manual de usuario y sus capturas. |
+| 24/oct | [`7add213`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/7add213) | Incorporación del README con las instrucciones de ejecución. |
+| 24/oct | [`6367dd6`](https://github.com/KenethEcheverria/IPC1F_KenethEcheverria_202501380_2S26_Proyecto2/commit/6367dd6) | Incorporación del archivo `ocupacion.txt` con datos de ejemplo. |
 
-La persistencia complementaria de espacios mediante `ocupacion.txt` forma parte de las últimas modificaciones del proyecto. Su publicación en el repositorio y la prueba de recuperación deben verificarse antes de dar por finalizada la entrega.
+La persistencia complementaria de espacios mediante `ocupacion.txt` se incorporó durante la etapa final del desarrollo y se publicó junto con los archivos de entrega. Se comprobó la recuperación de los vehículos registrados en sus espacios originales después de cerrar y reiniciar el programa, así como la actualización de la ocupación después de procesar una salida.
 
 ## 4. Problemas encontrados y soluciones
 
@@ -73,7 +79,7 @@ La persistencia complementaria de espacios mediante `ocupacion.txt` forma parte 
 | Búsqueda que desaparecía durante la simulación                  | Conservé el ID buscado entre las actualizaciones de la interfaz y restablecí el listado general después de eliminar residentes.                                                                                                                                        |
 | JAR compilado para una versión demasiado reciente de Java       | Ajusté el nivel del lenguaje y la versión del bytecode a Java 17, y reconstruí el artefacto ejecutable.                                                                                                                                                                |
 | Formato de persistencia sin tipo de vehículo                    | Conservé los cinco campos exigidos en `vehiculos.txt`. Al recuperar registros se utiliza `AUTOMOVIL` como tipo predeterminado, según la aclaración del auxiliar.                                                                                                       |
-| Recuperación del estado y del espacio estacionado               | Para atender la aclaración del auxiliar, incorporé el diseño de `ocupacion.txt` como archivo complementario, sin modificar `residentes.txt` ni `vehiculos.txt`. Esta modificación requiere una prueba final de cierre y recuperación antes de considerarse verificada. |
+| Recuperación del estado y del espacio estacionado | Incorporé `ocupacion.txt` como archivo complementario para conservar el estado `ESTACIONADO` y el espacio ocupado por cada vehículo registrado. Al reiniciar, el sistema reconstruye la ocupación sin modificar los formatos originales de `residentes.txt` y `vehiculos.txt`. |
 
 ## 5. Reglas y restricciones verificables en el diseño
 
@@ -107,9 +113,9 @@ Las verificaciones incluyeron pruebas manuales desde la interfaz gráfica y una 
 | Persistencia de residentes y vehículos            | **Aprobado.** Se comprobó el guardado y recuperación de registros mediante archivos de texto. Los datos se reconstruyeron correctamente al iniciar una nueva ejecución.                                                                                              |
 | Área general completa y rechazo de vehículos      | **Aprobado.** Se realizaron pruebas de ocupación mediante ingresos masivos de visitantes. Se comprobó que el sistema rechazara nuevas solicitudes cuando no existieran espacios generales disponibles y eliminara correctamente los registros temporales rechazados. |
 | Área de socios completa y desbordamiento          | **Aprobado.** Se verificó la ocupación de los 75 espacios reservados y la asignación de vehículos socios adicionales al área general cuando la zona exclusiva se encontraba llena.                                                                                   |
-| Integridad de los 150 espacios                    | **Aprobado .** Se comprobó que el parqueo estuviera compuesto por dos listas circulares de 75 nodos cada una, con identificadores únicos y enlaces correspondientes. En las pruebas de asignación realizadas no se detectaron espacios duplicados.                   |
+| Integridad de los 150 espacios                    | **Aprobado.** Se comprobó que el parqueo estuviera compuesto por dos listas circulares de 75 nodos cada una, con identificadores únicos y enlaces correspondientes. En las pruebas de asignación realizadas no se detectaron espacios duplicados.                   |
 | Cierre ordenado de las garitas                    | **Aprobado.** Se verificó la finalización de los hilos de las garitas antes del guardado y cierre de la aplicación, manteniendo la sincronización de las operaciones.                                                                                                |
-| Recuperación del espacio mediante `ocupacion.txt` | **Aprobado.** Se agregó el almacenamiento complementario del estado y espacio ocupado para reconstruir la ubicación de vehículos registrados al reiniciar.                                                                                                           |
+| Recuperación del espacio mediante `ocupacion.txt` | **Aprobado.** Se comprobó que SOC001 conservara el espacio A1 y GEN001 el espacio E1 después de reiniciar la aplicación. Posteriormente se solicitó la salida de SOC001 y se verificó que su registro desapareciera de `ocupacion.txt`, mientras GEN001 permanecía estacionado. |
 
 ### Conclusión de las pruebas
 
