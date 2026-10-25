@@ -62,7 +62,7 @@ public class PanelSalida extends JPanel {
         contenido.add(new JScrollPane(cola), BorderLayout.CENTER);
 
         add(acciones, BorderLayout.NORTH);
-        add(new JScrollPane(cola), BorderLayout.CENTER);
+        add(contenido, BorderLayout.CENTER);
     }
 
     private void solicitarSalida() {
@@ -111,7 +111,7 @@ public class PanelSalida extends JPanel {
         if (atendido != null) {
             ultimaPlaca = atendido.getPlaca();
 
-            estadoGarita.setText("<html><center>ATENDIENDO<br>" + atendido.getPlaca() + "</center></htmnl>");
+            estadoGarita.setText("<html><center>ATENDIENDO<br>" + atendido.getPlaca() + "</center></html>");
 
             estadoGarita.setBackground(new Color(255, 232, 185));
 
